@@ -1,0 +1,68 @@
+-- message1
+SELECT
+    order_id,
+    item_name,
+    quantity,
+    price,
+    -- if() evaluates quantity and categorize them as either bulk or standard order
+    IF(quantity > 2,
+        'Bulk Order',
+        'Standard Order') AS `Oder Size`,
+    -- if() evaluates price and categorize it as either highvalue or regular
+    -- IF(price > 20.00,
+       -- 'High Value',
+        -- 'Regular') AS `Value Tier`
+    IF( price > 20.00,
+        'Premium',
+        IF(price BETWEEN 10 AND 20,
+        'Mid Range',
+        'Budget'
+            )
+        )  AS `Value Tier2`      
+FROM
+    foodhub.orders
+;
+-- case statement are to be used instead of next when query statement exceeds 5
+
+-- MESSAGE2
+SELECT
+    name,
+    cuisine,
+    avg_rating,
+CASE
+    WHEN avg_rating >= 4.5 THEN 'Excellent'
+    WHEN avg_rating >= 4.0 AND avg_rating < 4.5 THEN 'Good'
+    WHEN avg_rating >= 3.5 AND avg_rating < 4.0 THEN 'Acceptable'
+ELSE
+    'Needs Improvement'
+END AS `Performance Label`
+FROM
+    foodhub.restaurants
+ORDER BY
+    avg_rating DESC
+;
+-- MESSAGE3
+SELECT
+    CASE
+        WHEN price > 20 THEN 'Premium'
+        WHEN price <= 10 AND price <= 20 THEN 'Mid-Range'
+    ELSE
+        'Budget'
+    END  AS `Price Tier`,
+    COUNT(*) AS `Total Orders`,
+    ROUND(SUM(quantity * price),2) AS `Total Revenue`
+FROM
+    foodhub.orders
+GROUP BY
+     CASE
+        WHEN price > 20 THEN 'Premium'
+        WHEN price <= 10 AND price <= 20 THEN 'Mid-Range'
+    ELSE
+        'Budget'
+    END
+    HAVING COUNT(*) >= 3
+ORDER BY
+    `Total Revenue` DESC
+;
+  --  It says Foodhub generates most of its revenue by constumers in the Budget
+  -- Price Tier and the least revenue from her Mid-Range Customers.
